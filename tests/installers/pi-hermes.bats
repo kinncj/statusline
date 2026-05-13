@@ -10,15 +10,21 @@ teardown() { teardown_fake_home; }
 @test "pi: install drops the extension package and AGENTS.md" {
     run_installer pi
     [ "$status" -eq 0 ]
-    # Native extension: statusline.mjs + a sibling statusline.sh so the
-    # extension's import.meta.url-relative lookup resolves locally.
+    # Pi's loader requires either index.{ts,js} or a package.json manifest
+    # with pi.extensions[]. We ship the manifest form so the .mjs keeps
+    # its descriptive name; without the manifest the file is silently
+    # skipped at discovery time.
+    [ -f "$HOME/.pi/agent/extensions/kinncj-statusline/package.json" ]
     [ -f "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.mjs" ]
     [ -x "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.sh" ]
     [ -f "$HOME/.pi/agent/AGENTS.md" ]
-    # Sanity: it's the real AGENTS.md, not an empty stub.
     grep -q 'kinncj statusline' "$HOME/.pi/agent/AGENTS.md"
-    # Sanity: the .mjs is the real extension (exports the factory).
     grep -q 'export default function' "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.mjs"
+    # Sanity: manifest declares the .mjs as a pi extension entry.
+    run jq_get "$HOME/.pi/agent/extensions/kinncj-statusline/package.json" '.pi.extensions[0]'
+    [ "$output" = "statusline.mjs" ]
+    run jq_get "$HOME/.pi/agent/extensions/kinncj-statusline/package.json" '.type'
+    [ "$output" = "module" ]
 }
 
 @test "pi: uninstall removes the extension and AGENTS.md" {

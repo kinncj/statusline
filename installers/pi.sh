@@ -19,7 +19,9 @@ source "$(dirname "$0")/_lib.sh"
 
 PI_DIR="${HOME}/.pi/agent"
 EXT_DIR="${PI_DIR}/extensions/kinncj-statusline"
-SRC_EXT="${REPO_DIR}/extensions/pi/statusline.mjs"
+SRC_EXT_DIR="${REPO_DIR}/extensions/pi"
+SRC_EXT="${SRC_EXT_DIR}/statusline.mjs"
+SRC_MANIFEST="${SRC_EXT_DIR}/package.json"
 
 if [ "${UNINSTALL:-0}" -eq 1 ]; then
     # remove_path only handles regular files; the extension package is a dir.
@@ -33,10 +35,15 @@ if [ "${UNINSTALL:-0}" -eq 1 ]; then
     exit 0
 fi
 
-# 1. Install the extension package alongside a copy of statusline.sh so the
-#    extension's `path.dirname(import.meta.url) + "/statusline.sh"` lookup
-#    resolves locally (no $PATH or repo-clone assumption).
+# 1. Install the extension package. Pi's discovery (loader.js in
+#    @earendil-works/pi-coding-agent 0.73.1) only matches `.ts`/`.js`
+#    files directly, or a subdir with `index.{ts,js}` or a `package.json`
+#    declaring `pi.extensions`. We ship the manifest form so the
+#    `.mjs` filename keeps its descriptive name. The sibling
+#    `statusline.sh` is dropped here too so the extension's
+#    `import.meta.url`-relative lookup resolves locally.
 run mkdir -p "$EXT_DIR"
+run cp "$SRC_MANIFEST" "$EXT_DIR/package.json"
 run cp "$SRC_EXT" "$EXT_DIR/statusline.mjs"
 run cp "$STATUSLINE_SRC" "$EXT_DIR/statusline.sh"
 run chmod +x "$EXT_DIR/statusline.sh"

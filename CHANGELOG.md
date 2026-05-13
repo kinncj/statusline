@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-12
+
+### Fixed
+- Pi extension was installed but **never loaded**: Pi 0.73.1's discovery
+  in `discoverExtensionsInDir` only matches files ending in `.ts`/`.js`,
+  or a subdir containing `index.{ts,js}`, or a subdir with a
+  `package.json` whose `pi.extensions[]` array lists the entry. Our
+  v0.2.0 ship had only `statusline.mjs` (no manifest, wrong extension),
+  so Pi silently skipped it. Added `extensions/pi/package.json` with
+  `{"type":"module","pi":{"extensions":["statusline.mjs"]}}` so the
+  manifest path resolves it. Installer copies the manifest alongside
+  the existing `.mjs`. After reinstall, relaunch `pi` and the widget
+  will render below the editor.
+
 ## [0.2.0] - 2026-05-12
 
 ### Added
@@ -82,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   launch. Cleans up the dead `statusLine`/`footer` keys older installer
   versions left in `settings.json`. Verified against Copilot CLI 1.0.46.
 
-[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/kinncj/statusline/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kinncj/statusline/releases/tag/v0.2.0
 [0.1.0]: https://github.com/kinncj/statusline/releases/tag/v0.1.0

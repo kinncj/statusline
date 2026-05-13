@@ -1,0 +1,10 @@
+{
+  "name": "kinncj-statusline",
+  "version": "0.2.1",
+  "description": "Pi extension that renders the kinncj statusline below the editor.",
+  "type": "module",
+  "private": true,
+  "pi": {
+    "extensions": ["statusline.mjs"]
+  }
+}
