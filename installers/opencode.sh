@@ -35,5 +35,8 @@ json_set "$SETTINGS" \
         "experimental": (.experimental // {} | . + {"statusline": {"command": $cmd}})
     }'
 
-ok "opencode wired"
-info "restart opencode to pick up the new statusline"
+warn "opencode upstream has NOT shipped a statusline hook yet"
+info "tracking issue: https://github.com/anomalyco/opencode/issues/8619"
+info "we wrote the proposed config keys speculatively so a future ship auto-activates"
+info "today, opencode renders its built-in footer and ignores these keys"
+ok "opencode config written (statusline pending upstream)"

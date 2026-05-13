@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-05-13
+
+### Changed
+- `installers/opencode.sh` no longer claims "opencode wired" on success.
+  OpenCode 1.14.48 has no statusline plugin hook — verified by enumerating
+  the full event surface in `@opencode-ai/plugin`'s `dist/index.d.ts`
+  (`chat.*`, `tool.execute.*`, `permission.ask`, etc. — all behavioral,
+  none render). The installer still writes the proposed config keys
+  speculatively so a future upstream ship (tracking
+  anomalyco/opencode#8619) auto-activates, but it now prints a clear
+  "pending upstream" warning and links the issue so users aren't
+  confused when their built-in footer keeps rendering.
+- README and AGENTS.md updated to reflect the real opencode status: not
+  pending-implementation, but pending-upstream — there's no plugin-side
+  workaround that avoids burning context tokens.
+
 ## [0.2.2] - 2026-05-12
 
 ### Fixed
@@ -123,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   launch. Cleans up the dead `statusLine`/`footer` keys older installer
   versions left in `settings.json`. Verified against Copilot CLI 1.0.46.
 
-[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/kinncj/statusline/releases/tag/v0.2.3
 [0.2.2]: https://github.com/kinncj/statusline/releases/tag/v0.2.2
 [0.2.1]: https://github.com/kinncj/statusline/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kinncj/statusline/releases/tag/v0.2.0

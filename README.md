@@ -60,14 +60,14 @@ The installer renders a boxed, animated TUI by default. Animations auto-disable 
 |----------------------------|:----------:|:---------:|------------------------------------------|
 | **Claude Code**            | ✓          | ✓         | `~/.claude/settings.json`                |
 | **GitHub Copilot CLI**     | ✓          | ✓         | `~/.copilot/config.json` (requires `experimental: true`, which the installer sets) |
-| **OpenCode**               | ⚠ pending  | ✓         | `~/.config/opencode/opencode.json` (FR: anomalyco/opencode#8619) |
+| **OpenCode**               | ✗ upstream | ✓         | `~/.config/opencode/opencode.json` — feature not yet shipped by opencode; tracked at [anomalyco/opencode#8619](https://github.com/anomalyco/opencode/issues/8619). Installer writes the proposed schema speculatively so a future ship auto-activates; today, opencode's built-in footer is what renders. |
 | **Pi (pi.dev)**            | ✓          | ✓         | `~/.pi/agent/extensions/kinncj-statusline/` (native Pi extension; auto-discovered, no settings to edit) |
 | **Hermes (nousresearch)**  | —          | ✓ + skill | `~/.hermes/` (full TUI, no script hook)  |
 
 - **Pi** is wired via a native extension (`extensions/pi/statusline.mjs`) that Pi auto-discovers from `~/.pi/agent/extensions/`. The extension bridges Pi's session context (`ctx.cwd`, `ctx.model`, `ctx.getContextUsage()`) into the same `statusline.sh` we use everywhere else and renders the output as a widget below the editor. Pi's own native footer stays as-is, so you get both lines.
 - **Hermes** ships a fixed built-in TUI with skin-level theming only and no extension point. We install AGENTS.md + the `statusline-edit` skill so the repo's instructions travel with you.
 
-**OpenCode** doesn't ship the hook yet — the installer writes the two proposed key shapes speculatively so it'll work as soon as anomalyco/opencode#8619 ships.
+**OpenCode** has no statusline hook in 1.14.48 — verified against the binary's full plugin event list (`chat.*`, `tool.execute.*`, `permission.ask`, etc., all behavioral, none render). The feature is tracked upstream at [anomalyco/opencode#8619](https://github.com/anomalyco/opencode/issues/8619) — still open. The installer prints a clear "pending upstream" warning, drops our `statusline.sh` into the config dir, and writes both proposed key shapes (`statusline.command` and `experimental.statusline.command`) into `opencode.json` so whichever the upstream merge picks will auto-activate without a re-install. Until then, opencode's built-in footer is what you see and our script sits idle. Building a plugin against today's API doesn't help — the only display surface is `chat.message`, which costs context tokens (the exact problem #8619 was filed to fix).
 
 ## What's in line 2
 
