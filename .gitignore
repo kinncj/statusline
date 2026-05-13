@@ -1,0 +1,32 @@
+# ── editors / OS ──────────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── node (used only for `npm i -g bats` etc — never checked in) ───────────────
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# ── shell / test scratch ──────────────────────────────────────────────────────
+*.log
+*.tmp
+.tmp/
+tests/installers/*.tmp
+
+# ── bats local helpers (if anyone vendors bats-core/-support/-assert) ─────────
+tests/libs/
+tests/lib/
+tests/test_helper/bats-*/
+
+# ── installed artifacts users might generate inside the repo while testing ───
+.fake-home/
+sandbox/
+
+# ── per-CLI local agent state — not source code, can vary per-machine ────────
+.claude/settings.local.json
+.claude/state/
+.opencode/state/
