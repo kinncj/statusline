@@ -24,6 +24,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before launching `pi` and per-event records (module load, event firings,
   ctx shape, statusline.sh exit code, setWidget errors) are appended to
   `/tmp/pi-statusline-debug.log`. No-op when unset.
+- `bootstrap.sh` now prints a version header on every run: installed
+  version (tag + short SHA, or "not yet installed"), latest release tag
+  on the remote, and latest commit on the tracked ref. After the
+  clone/update it prints a one-line verdict (`✓ installed at vX.Y.Z`,
+  `✓ already at vX.Y.Z — re-running install`, or
+  `↑ updated: vA.B.C → vX.Y.Z`). The bootstrap already always pulled
+  latest; this surfaces *what changed* so re-running `curl … | bash`
+  is no longer opaque. Tag refs are now fetched alongside the branch
+  so `git describe` can name the current commit when it lands on a tag.
 
 ## [0.2.1] - 2026-05-12
 

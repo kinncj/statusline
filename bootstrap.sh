@@ -43,15 +43,51 @@ need() {
 need git
 need bash
 
+# Describe HEAD as `<tag> (<short-sha>)` when on or near a tag, else `<short-sha>`.
+# Works against any clone, shallow or otherwise; tag info is best-effort.
+git_describe_head() {
+    local dir="$1" sha desc
+    sha=$(git -C "$dir" rev-parse --short HEAD 2>/dev/null) || return
+    desc=$(git -C "$dir" describe --tags --always --exact-match HEAD 2>/dev/null) || desc=""
+    if [ -n "$desc" ] && [ "$desc" != "$sha" ]; then
+        printf '%s (%s)' "$desc" "$sha"
+    else
+        printf '%s' "$sha"
+    fi
+}
+
+# Highest semver tag visible on the remote, e.g. "v0.2.2". Empty if no tags.
+remote_latest_tag() {
+    git ls-remote --tags --refs "$REPO_URL" 2>/dev/null \
+        | awk '{print $2}' | sed 's@refs/tags/@@' \
+        | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+        | sort -V | tail -1
+}
+
+# Short SHA at the tip of $STATUSLINE_REF on the remote (branch or tag ref).
+remote_tip_sha() {
+    git ls-remote --refs "$REPO_URL" "refs/heads/${STATUSLINE_REF}" 2>/dev/null \
+        | awk '{print substr($1,1,7); exit}'
+}
+
+CURRENT_DESC=""
+[ -d "$STATUSLINE_DIR/.git" ] && CURRENT_DESC=$(git_describe_head "$STATUSLINE_DIR")
+LATEST_TAG=$(remote_latest_tag)
+LATEST_TIP=$(remote_tip_sha)
+
 echo "kinncj statusline bootstrap"
-echo "  repo: $REPO_URL"
-echo "  ref:  $STATUSLINE_REF"
-echo "  dir:  $STATUSLINE_DIR"
+echo "  repo:           $REPO_URL"
+echo "  tracking:       $STATUSLINE_REF"
+echo "  dir:            $STATUSLINE_DIR"
+echo "  installed:      ${CURRENT_DESC:-(not yet installed)}"
+echo "  latest release: ${LATEST_TAG:-(no semver tag)}"
+[ -n "$LATEST_TIP" ] && echo "  latest commit:  $LATEST_TIP on $STATUSLINE_REF"
 echo
 
 if [ -d "$STATUSLINE_DIR/.git" ]; then
     echo "↻ updating existing clone"
-    git -C "$STATUSLINE_DIR" fetch --depth 1 origin "$STATUSLINE_REF"
+    # --tags so `git describe` can resolve tag names after the reset.
+    git -C "$STATUSLINE_DIR" fetch --depth 1 --tags origin "$STATUSLINE_REF"
     git -C "$STATUSLINE_DIR" checkout -q "$STATUSLINE_REF"
     git -C "$STATUSLINE_DIR" reset --hard "origin/$STATUSLINE_REF" 2>/dev/null \
         || git -C "$STATUSLINE_DIR" reset --hard "$STATUSLINE_REF"
@@ -59,7 +95,20 @@ else
     mkdir -p "$(dirname "$STATUSLINE_DIR")"
     echo "↓ cloning into $STATUSLINE_DIR"
     git clone --depth 1 --branch "$STATUSLINE_REF" "$REPO_URL" "$STATUSLINE_DIR"
+    # Tag refs aren't pulled by a branch-scoped shallow clone; fetch them so
+    # `git describe` can name the current commit if it landed on a tag.
+    git -C "$STATUSLINE_DIR" fetch --depth 1 --tags origin >/dev/null 2>&1 || true
 fi
+
+NEW_DESC=$(git_describe_head "$STATUSLINE_DIR")
+if [ -z "$CURRENT_DESC" ]; then
+    echo "✓ installed at $NEW_DESC"
+elif [ "$CURRENT_DESC" = "$NEW_DESC" ]; then
+    echo "✓ already at $NEW_DESC — re-running install"
+else
+    echo "↑ updated: $CURRENT_DESC → $NEW_DESC"
+fi
+echo
 
 INSTALL="$STATUSLINE_DIR/install.sh"
 [ -x "$INSTALL" ] || chmod +x "$INSTALL"
