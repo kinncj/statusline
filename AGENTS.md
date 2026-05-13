@@ -40,7 +40,7 @@ Be honest in user-facing docs about which of these installers is wiring somethin
 | Tool         | Statusline hook support     | Notes |
 |--------------|-----------------------------|-------|
 | Claude Code  | ✓ shipped                   | `settings.json.statusLine = {type:"command", command, padding}` — official. |
-| Copilot CLI  | ✓ shipped                   | Confirmed via github/copilot-cli changelog. Same shape as Claude Code, lives in `~/.copilot/settings.json` (user settings) — *not* `config.json` (internal state). Toggle visibility with `/statusline` inside Copilot. `statusLine.command` supports `~` and env vars. |
+| Copilot CLI  | ✓ shipped                   | Config lives in `~/.copilot/config.json`. The neighbouring `settings.json` is read for unrelated user prefs and a misleading header comment ("User settings belong in settings.json") — its `statusLine` key is **ignored**. Requires the experimental feature gate, which we persist with `"experimental": true` in the same file (equivalent to launching `copilot --experimental`). The `command` path must be **absolute** (no `~`, no env var expansion) and the script must be executable with a valid shebang. config.json starts with `//` comment lines that jq can't parse — installer strips them before merging. Verified against Copilot CLI 1.0.46 and griches/copilot-hud's setup skill. |
 | OpenCode     | ⚠ not shipped               | Feature request open at anomalyco/opencode#8619. Our installer writes `.statusline` and `.experimental.statusline` keys speculatively so a future ship lands without a re-install. Today the runtime ignores them; the AGENTS.md drop is what carries weight. |
 | Pi           | ✗ no command-style hook     | Pi customizes its footer through an npm extension system, **not** a shell-command hook like Claude Code. Users run `pi install npm:pi-powerline-footer` (or `pi-bar`, `pi-side-agents`, etc.). Our installer drops AGENTS.md and points users at the package. To wire `statusline.sh` natively into Pi we'd have to publish our own npm extension — not done. |
 | Hermes       | ✗ no scriptable statusline  | Built-in TUI; only `display.tui_status_indicator` is tunable. AGENTS.md + skill only. |
@@ -51,15 +51,31 @@ If you change an installer to wire something new, verify against the upstream to
 
 The statusline's `jq -r '… // empty'` filters mean missing fields silently render nothing — but the *shape* differs per host. When adding or debugging a segment, confirm the key path against the host you're targeting:
 
-| Field                                  | Claude Code | OpenCode | Copilot CLI |
-|----------------------------------------|-------------|----------|-------------|
-| `.cwd`                                 | ✓           | ✓        | ✓           |
-| `.model.display_name`                  | ✓           | ✓        | ✓ (likely)  |
-| `.transcript_path`                     | ✓           | ✓        | ✓           |
-| `.context_window.used_percentage`      | ✓           | ✓        | ✓           |
-| `.context_window.context_window_size`  | ✓           | ✓        | ?           |
-| `.rate_limits.{five_hour,seven_day}.*` | ✓ (Pro/Max) | —        | —           |
-| `.thinking.enabled` / `.effort.level`  | ✓           | ?        | ?           |
+| Field                                            | Claude Code | OpenCode | Copilot CLI |
+|--------------------------------------------------|-------------|----------|-------------|
+| `.cwd`                                           | ✓           | ✓        | ✓           |
+| `.session_id` / `.session_name`                  | —           | ?        | ✓           |
+| `.model.display_name`                            | ✓           | ✓        | ✓           |
+| `.transcript_path` (Claude: file; Copilot: dir)  | ✓ file      | ✓ file   | ✓ directory |
+| `.context_window.used_percentage`                | ✓           | ✓        | ✓ but `null` on auto-routed free models |
+| `.context_window.context_window_size`            | ✓           | ✓        | ✓ but `null` on auto-routed free models |
+| `.context_window.current_context_used_percentage`| —           | —        | ✓ (Copilot fallback) |
+| `.context_window.displayed_context_limit`        | —           | —        | ✓ (Copilot fallback) |
+| `.context_window.current_context_tokens`         | —           | —        | ✓ live working set |
+| `.context_window.total_input_tokens`             | ✓           | ✓        | ✓           |
+| `.context_window.total_output_tokens`            | ✓           | ✓        | ✓           |
+| `.cost.total_premium_requests` (fractional)      | —           | —        | ✓           |
+| `.cost.total_lines_added` / `total_lines_removed`| —           | —        | ✓           |
+| `.cost.total_api_duration_ms`                    | —           | —        | ✓ API wall time |
+| `.cost.total_duration_ms`                        | —           | —        | ✓ session wall time |
+| `.rate_limits.{five_hour,seven_day}.*`           | ✓ (Pro/Max) | —        | —           |
+| `.thinking.enabled` / `.effort.level`            | ✓           | ?        | —           |
+
+Copilot's context block toggles between two semantic modes within a single session:
+- **Premium model active** (e.g. `claude-opus-4.7`): primary fields populate (`used_percentage`, `context_window_size`, `remaining_tokens`).
+- **Auto-routed to a free model** (e.g. `Auto → GPT-5.3-Codex`): primary fields go `null`; only `current_context_*` and `displayed_context_limit` are set. The statusline chains `used_percentage // current_context_used_percentage` and `context_window_size // displayed_context_limit` so the block keeps rendering across both modes.
+
+Copilot does **not** ship `rate_limits` (its "Remaining reqs.: N%" footer is computed from a separate channel not exposed to `statusLine`), and does not ship `thinking` / `effort` in the JSON payload (effort is a launch-time CLI flag, not a per-render field).
 
 Pi and Hermes do not pipe JSON to a statusline script — they have no such hook.
 

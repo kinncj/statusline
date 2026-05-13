@@ -53,9 +53,13 @@ if [ -n "$model_name" ]; then
 fi
 
 # ── context window usage ─────────────────────────────────────────────────────
+# Fallbacks cover Copilot CLI: when its auto-router lands on a free model it
+# nulls `used_percentage`/`context_window_size` and only `current_context_*`
+# and `displayed_context_limit` are populated. Claude payloads never trigger
+# the fallbacks because the primary fields are always set.
 ctx_block=""
-used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
-ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // empty')
+used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // .context_window.current_context_used_percentage // empty')
+ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // .context_window.displayed_context_limit // empty')
 total_in=$(echo "$input" | jq -r '.context_window.total_input_tokens // empty')
 total_out=$(echo "$input" | jq -r '.context_window.total_output_tokens // empty')
 
@@ -103,24 +107,59 @@ if [ -n "$transcript_path" ] && [ -f "$transcript_path" ] && command -v npx >/de
     fi
 fi
 
-# ── session duration (from transcript file mtime) ────────────────────────────
+# Copilot CLI cost fields: total_premium_requests is fractional cost units
+# (not an integer count); total_lines_added/removed reflect edits this session;
+# total_api_duration_ms is wall time spent in API calls. This branch only
+# fires when ccusage didn't (Claude payloads don't carry .cost.total_premium_requests).
+if [ "$ccusage_succeeded" = "0" ]; then
+    premium=$(echo "$input" | jq -r '.cost.total_premium_requests // empty')
+    if [ -n "$premium" ]; then
+        lines_add=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
+        lines_rm=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
+        api_ms=$(echo "$input" | jq -r '.cost.total_api_duration_ms // empty')
+        premium_fmt=$(awk -v v="$premium" 'BEGIN{ printf "%.1f", v }')
+        cost_str="💰 ${premium_fmt} reqs"
+        if [ "$lines_add" != "0" ] || [ "$lines_rm" != "0" ]; then
+            cost_str="${cost_str} · +${lines_add}/-${lines_rm}"
+        fi
+        if [ -n "$api_ms" ] && [ "$api_ms" -gt 0 ] 2>/dev/null; then
+            api_s=$(awk -v ms="$api_ms" 'BEGIN{ printf "%.1f", ms/1000 }')
+            cost_str="${cost_str} · api ${api_s}s"
+        fi
+        usage_block="${YELLOW}${cost_str}${RESET}"
+    fi
+fi
+
+# ── session duration ─────────────────────────────────────────────────────────
+# Copilot reports authoritative wall time in `.cost.total_duration_ms`; prefer
+# that. Claude doesn't ship it, so fall back to transcript_path mtime.
 duration_block=""
-if [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
+duration_str=""
+total_dur_ms=$(echo "$input" | jq -r '.cost.total_duration_ms // empty')
+if [ -n "$total_dur_ms" ] && [ "$total_dur_ms" -gt 0 ] 2>/dev/null; then
+    elapsed=$(( total_dur_ms / 1000 ))
+    elapsed_min=$(( elapsed / 60 ))
+    if [ "$elapsed_min" -ge 60 ]; then
+        duration_str="$(( elapsed_min / 60 ))h$(( elapsed_min % 60 ))m"
+    elif [ "$elapsed_min" -ge 1 ]; then
+        duration_str="${elapsed_min}m"
+    else
+        duration_str="${elapsed}s"
+    fi
+elif [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
     file_mtime=$(stat -c %Y "$transcript_path" 2>/dev/null)
     now=$(date +%s)
     if [ -n "$file_mtime" ] && [ "$now" -gt "$file_mtime" ]; then
         elapsed=$(( now - file_mtime ))
         elapsed_min=$(( elapsed / 60 ))
         if [ "$elapsed_min" -ge 60 ]; then
-            elapsed_h=$(( elapsed_min / 60 ))
-            elapsed_m=$(( elapsed_min % 60 ))
-            duration_str="${elapsed_h}h${elapsed_m}m"
+            duration_str="$(( elapsed_min / 60 ))h$(( elapsed_min % 60 ))m"
         else
             duration_str="${elapsed_min}m"
         fi
-        duration_block="${SEP}${DIM}${duration_str}${RESET}"
     fi
 fi
+[ -n "$duration_str" ] && duration_block="${SEP}${DIM}${duration_str}${RESET}"
 
 # ── output style ──────────────────────────────────────────────────────────────
 style_block=""

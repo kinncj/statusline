@@ -59,7 +59,7 @@ The installer renders a boxed, animated TUI by default. Animations auto-disable 
 | Tool                       | Statusline | AGENTS.md | Config path                              |
 |----------------------------|:----------:|:---------:|------------------------------------------|
 | **Claude Code**            | ✓          | ✓         | `~/.claude/settings.json`                |
-| **GitHub Copilot CLI**     | ✓          | ✓         | `~/.copilot/settings.json`               |
+| **GitHub Copilot CLI**     | ✓          | ✓         | `~/.copilot/config.json` (requires `experimental: true`, which the installer sets) |
 | **OpenCode**               | ⚠ pending  | ✓         | `~/.config/opencode/opencode.json` (FR: anomalyco/opencode#8619) |
 | **Pi (pi.dev)**            | —          | ✓         | `~/.pi/agent/` — Pi uses npm extensions, not a script hook |
 | **Hermes (nousresearch)**  | —          | ✓ + skill | `~/.hermes/` (full TUI, no script hook)  |
@@ -72,11 +72,18 @@ Pi and Hermes don't expose a script-driven statusline:
 
 ## What's in line 2
 
-- `context: N%` of the context window, with `(used/total, remaining)` in human units
-- `🤖` model name (from ccusage)
-- `💰 API-est:` session / today / billing-block costs — **API list-price estimates**, not what Claude.ai Pro/Max subscribers actually pay
-- `🔥 $X/hr` burn rate
-- `5h quota` / `7d quota` percentage and reset countdown (Claude.ai subscriber data, when the host provides it)
+The full set of segments, in order; what actually renders depends on what the host pipes in (missing fields just silently drop):
+
+- `context: N%` of the context window, with `(used/total, remaining)` in human units. On Copilot CLI's auto-routed free models the primary fields go `null` — the statusline falls back to `current_context_used_percentage` / `displayed_context_limit` so the block keeps rendering.
+- **Cost cluster (Claude path, via `ccusage`):**
+  - `🤖` model name
+  - `💰 API-est:` session / today / billing-block costs — **API list-price estimates**, not what Claude.ai Pro/Max subscribers actually pay
+  - `🔥 $X/hr` burn rate
+- **Cost cluster (Copilot path, native fields):** `💰 N.N reqs · +A/-R · api N.Ns` from `cost.total_premium_requests` (fractional units, not an integer count), `total_lines_added/removed`, and `total_api_duration_ms`. Activates only when `ccusage` didn't (Claude payloads never trigger it).
+- `5h quota` / `7d quota` percentage and reset countdown (Claude.ai subscriber data only — Copilot's "Remaining reqs." native footer isn't exposed to the `statusLine` hook).
+- `session: Nm` wall time. Copilot supplies authoritative `cost.total_duration_ms`; Claude falls back to `transcript_path` mtime.
+
+The host-specific field map and the exact fallback chain live in [`AGENTS.md`](AGENTS.md#host-json-schemas-what-stdin-looks-like).
 
 ## Dependencies
 

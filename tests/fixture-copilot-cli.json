@@ -1,15 +1,35 @@
 {
   "cwd": "/home/kinncj/Development/kinncj/statusline",
+  "session_id": "de5be3fb-89d5-48e7-837f-8bc63ae266ec",
+  "session_name": "Greet User",
+  "transcript_path": "/home/kinncj/.copilot/session-state/de5be3fb-89d5-48e7-837f-8bc63ae266ec",
   "model": {
-    "display_name": "GPT-5"
+    "id": "claude-opus-4.7",
+    "display_name": "claude-opus-4.7 (15x) (medium)"
+  },
+  "workspace": {
+    "current_dir": "/home/kinncj/Development/kinncj/statusline"
+  },
+  "version": "1.0.46",
+  "cost": {
+    "total_api_duration_ms": 4914,
+    "total_lines_added": 42,
+    "total_lines_removed": 5,
+    "total_duration_ms": 63849,
+    "total_premium_requests": 15.66
   },
   "context_window": {
-    "used_percentage": 14,
-    "context_window_size": 128000,
-    "total_input_tokens": 16000,
-    "total_output_tokens": 2000
-  },
-  "cost": {
-    "session": 0.42
+    "total_input_tokens": 85529,
+    "total_output_tokens": 90,
+    "total_cache_read_tokens": 43520,
+    "total_cache_write_tokens": 39769,
+    "total_tokens": 85619,
+    "context_window_size": 200000,
+    "used_percentage": 20,
+    "remaining_percentage": 80,
+    "remaining_tokens": 160202,
+    "displayed_context_limit": 200000,
+    "current_context_tokens": 13909,
+    "current_context_used_percentage": 7
   }
 }
