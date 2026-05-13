@@ -29,4 +29,5 @@ sandbox/
 # ── per-CLI local agent state — not source code, can vary per-machine ────────
 .claude/settings.local.json
 .claude/state/
+.claude/scheduled_tasks.lock
 .opencode/state/
