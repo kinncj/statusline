@@ -1,6 +1,4 @@
-# kinncj statusline
-
-<p align="center">
+# <p align="center">
   <img src="assets/logo.svg" alt="kinncj statusline" width="540">
 </p>
 
