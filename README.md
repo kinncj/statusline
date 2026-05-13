@@ -10,7 +10,11 @@
         s · t · a · t · u · s · l · i · n · e
 ```
 
-[![CI](https://github.com/kinncj/statusline/actions/workflows/ci.yml/badge.svg)](https://github.com/kinncj/statusline/actions/workflows/ci.yml)
+[![CI](https://github.com/kinncj/statusline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kinncj/statusline/actions/workflows/ci.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Made with Bash](https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?logo=gnu-bash)](https://www.gnu.org/software/bash/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 A portable, two-line statusline for AI CLIs. Shows model, context usage with tokens remaining, API-estimated costs, and Claude.ai rate-limit quotas with reset times.
 
@@ -86,3 +90,26 @@ Pi and Hermes don't expose a script-driven statusline:
 Read `AGENTS.md` — it has the conventions, the bash gotchas, the host JSON schemas, and the test recipe. Mock fixtures live in `tests/`.
 
 If you're an AI agent working in this repo (Claude Code, OpenCode, etc.), `AGENTS.md` is loaded automatically. The `.claude/` and `.opencode/` directories also contain in-repo agent definitions for testing and safe-edit workflows.
+
+## Tests
+
+```bash
+tests/run.sh                  # full bats suite (install bats first)
+tests/run.sh claude-code      # filter by name
+```
+
+See [`AGENTS.md`](AGENTS.md#testing-changes) for the full recipe (mock fixtures, ccusage stub, etc.).
+
+## Project docs
+
+- [Changelog](CHANGELOG.md) — release notes per version.
+- [Contributing](CONTRIBUTING.md) — how to send a patch and the bar it has to clear.
+- [Code of Conduct](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1.
+- [Security](SECURITY.md) — how to report a vulnerability (don't open a public issue).
+- [Authors](AUTHORS.md) — maintainer + contributor credits.
+
+## License
+
+[GPL-3.0-or-later](LICENSE) © Kinn Coelho Juliao &lt;kinncj@protonmail.com&gt;
+
+The statusline is yours to use, modify, and redistribute — provided derivative works stay under a compatible license. See [`LICENSE`](LICENSE) for the full text.
