@@ -64,10 +64,20 @@ json_set() {
 
     local tmp
     tmp="$(mktemp)"
-    if [ -s "$file" ]; then
-        jq "${jq_flags[@]}" "$expr" "$file" > "$tmp"
+    # Bash 3.2 (macOS /bin/bash) treats "${empty_array[@]}" as unbound under
+    # `set -u`, so branch on length rather than splatting unconditionally.
+    if [ "${#jq_flags[@]}" -gt 0 ]; then
+        if [ -s "$file" ]; then
+            jq "${jq_flags[@]}" "$expr" "$file" > "$tmp"
+        else
+            echo '{}' | jq "${jq_flags[@]}" "$expr" > "$tmp"
+        fi
     else
-        echo '{}' | jq "${jq_flags[@]}" "$expr" > "$tmp"
+        if [ -s "$file" ]; then
+            jq "$expr" "$file" > "$tmp"
+        else
+            echo '{}' | jq "$expr" > "$tmp"
+        fi
     fi
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
