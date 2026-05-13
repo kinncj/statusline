@@ -12,9 +12,15 @@
 
 A portable, two-line statusline for AI CLIs. Shows model, context usage with tokens remaining, API-estimated costs, and Claude.ai rate-limit quotas with reset times.
 
+<p align="center">
+  <img src="assets/statusline-preview.png" alt="Live statusline screenshot showing dir, branch, thinking effort, context %, model, API-est costs, burn rate, and Claude.ai 5h/7d quotas" width="100%">
+</p>
+
+Plain-text version of the same output (handy for copy/paste, terminal previews):
+
 ```
-dir: frontend | branch: main | think:xhigh
-context: 6% (56K/1.0M, 943K left) | 🤖 Opus 4.7 (1M context) | 💰 API-est: $1.39 session / $0.00 today / $5.61 block (3h 41m left) | 🔥 $11.79/hr | 5h quota: 7% (resets 3h41m) | 7d quota: 12% (resets 5d0h)
+dir: statusline | branch: main | think:medium
+context: 20% (205K/1.0M, 794K left) | 🤖 Opus 4.7 | 💰 API-est: $14.13 session / $0.00 today / $25.52 block (2h 34m left) | 🔥 $15.96/hr | 5h quota: 25% | 7d quota: 14%
 ```
 
 ## Install
