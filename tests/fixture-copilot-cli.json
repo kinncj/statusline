@@ -1,0 +1,15 @@
+{
+  "cwd": "/home/kinncj/Development/kinncj/statusline",
+  "model": {
+    "display_name": "GPT-5"
+  },
+  "context_window": {
+    "used_percentage": 14,
+    "context_window_size": 128000,
+    "total_input_tokens": 16000,
+    "total_output_tokens": 2000
+  },
+  "cost": {
+    "session": 0.42
+  }
+}

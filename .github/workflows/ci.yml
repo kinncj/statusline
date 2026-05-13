@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: bats (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install bats + jq (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats jq
+
+      - name: Install bats + jq (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install bats-core jq
+
+      - name: Show versions
+        run: |
+          bash --version | head -1
+          bats --version
+          jq --version
+
+      - name: Run installer test suite
+        run: bats tests/installers/*.bats
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck
+        # SC1091 = "can't follow source" (we source by relative path at runtime).
+        # SC2155 = "declare and assign separately" — fine for our local var style.
+        uses: ludeeus/action-shellcheck@2.0.0
+        env:
+          SHELLCHECK_OPTS: -e SC1091 -e SC2155 -x
+        with:
+          scandir: '.'
+          ignore_paths: 'tests'
+
+  statusline-smoke:
+    name: statusline.sh fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Render each fixture
+        run: |
+          set -euo pipefail
+          for f in tests/fixture-*.json; do
+            echo "── $f ──"
+            bash statusline.sh < "$f" | sed 's/\x1b\[[0-9;]*m//g'
+            echo
+          done
