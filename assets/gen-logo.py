@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Generate assets/logo.svg from the ANSI Shadow block-letter art.
+"""Generate assets/ascii_logo.svg from the ANSI Shadow block-letter art.
 
 Each character is mapped to a list of (x, y, w, h) sub-rectangles
 expressed in a per-cell coordinate system (0..CW × 0..CH). Full blocks
@@ -15,7 +15,7 @@ the rasterizer can't insert visible gaps between adjacent cells.
 
 Run after changing the art in installers/_tui.sh:
 
-    python3 assets/gen-logo.py assets/logo.svg
+    python3 assets/gen-logo.py assets/ascii_logo.svg
 """
 import sys
 

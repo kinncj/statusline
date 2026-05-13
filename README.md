@@ -1,5 +1,5 @@
-# <p align="center">
-  <img src="assets/logo.svg" alt="kinncj statusline" width="540">
+<p align="center">
+  <img src="assets/ascii_logo.svg" alt="kinncj statusline" width="540">
 </p>
 
 [![CI](https://github.com/kinncj/statusline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kinncj/statusline/actions/workflows/ci.yml)
