@@ -7,19 +7,26 @@ load test_helper
 setup()    { setup_fake_home; }
 teardown() { teardown_fake_home; }
 
-@test "pi: install drops AGENTS.md into ~/.pi/agent/" {
+@test "pi: install drops the extension package and AGENTS.md" {
     run_installer pi
     [ "$status" -eq 0 ]
+    # Native extension: statusline.mjs + a sibling statusline.sh so the
+    # extension's import.meta.url-relative lookup resolves locally.
+    [ -f "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.mjs" ]
+    [ -x "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.sh" ]
     [ -f "$HOME/.pi/agent/AGENTS.md" ]
-    # Sanity: it's the real one, not an empty stub.
+    # Sanity: it's the real AGENTS.md, not an empty stub.
     grep -q 'kinncj statusline' "$HOME/.pi/agent/AGENTS.md"
+    # Sanity: the .mjs is the real extension (exports the factory).
+    grep -q 'export default function' "$HOME/.pi/agent/extensions/kinncj-statusline/statusline.mjs"
 }
 
-@test "pi: uninstall removes AGENTS.md" {
+@test "pi: uninstall removes the extension and AGENTS.md" {
     run_installer pi
-    [ -f "$HOME/.pi/agent/AGENTS.md" ]
+    [ -d "$HOME/.pi/agent/extensions/kinncj-statusline" ]
     UNINSTALL=1 run_installer pi
     [ "$status" -eq 0 ]
+    [ ! -e "$HOME/.pi/agent/extensions/kinncj-statusline" ]
     [ ! -e "$HOME/.pi/agent/AGENTS.md" ]
 }
 

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-12
+
+### Added
+- Pi (`@earendil-works/pi-coding-agent`, formerly `@mariozechner/pi-coding-agent`)
+  is now a fully supported target instead of AGENTS.md-only. New
+  `extensions/pi/statusline.mjs` is a native Pi `ExtensionFactory`
+  (auto-discovered from `~/.pi/agent/extensions/`) that subscribes to
+  `session_start`/`turn_end`/`tool_execution_end`/`agent_end`/`model_select`,
+  synthesizes a Claude-shaped payload from `ctx.cwd` + `ctx.model`
+  + `ctx.getContextUsage()`, execs the same `statusline.sh` every other
+  host uses, and renders the result via
+  `ctx.ui.setWidget(key, lines, {placement:"belowEditor"})`. Pi's native
+  footer stays as-is; our widget sits under the editor so both lines
+  coexist. No settings to edit — Pi auto-discovers the extension on
+  next launch.
+- `installers/pi.sh` rewritten: installs the extension package
+  (`statusline.mjs` + a sibling `statusline.sh` so the extension's
+  `import.meta.url`-relative lookup resolves locally) into
+  `~/.pi/agent/extensions/kinncj-statusline/`, alongside AGENTS.md.
+
+### Fixed
+- `tests/installers/copilot-cli.bats` updated for the v0.1.0 config-file
+  migration (statusLine now in `~/.copilot/config.json`, not
+  `settings.json`). Adds coverage for the `//` header-comment strip
+  path and the `settings.json` dead-key migration.
+
 ## [0.1.0] - 2026-05-12
 
 ### Added
@@ -56,5 +82,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   launch. Cleans up the dead `statusLine`/`footer` keys older installer
   versions left in `settings.json`. Verified against Copilot CLI 1.0.46.
 
-[Unreleased]: https://github.com/kinncj/statusline/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kinncj/statusline/releases/tag/v0.2.0
 [0.1.0]: https://github.com/kinncj/statusline/releases/tag/v0.1.0

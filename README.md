@@ -61,12 +61,11 @@ The installer renders a boxed, animated TUI by default. Animations auto-disable 
 | **Claude Code**            | ✓          | ✓         | `~/.claude/settings.json`                |
 | **GitHub Copilot CLI**     | ✓          | ✓         | `~/.copilot/config.json` (requires `experimental: true`, which the installer sets) |
 | **OpenCode**               | ⚠ pending  | ✓         | `~/.config/opencode/opencode.json` (FR: anomalyco/opencode#8619) |
-| **Pi (pi.dev)**            | —          | ✓         | `~/.pi/agent/` — Pi uses npm extensions, not a script hook |
+| **Pi (pi.dev)**            | ✓          | ✓         | `~/.pi/agent/extensions/kinncj-statusline/` (native Pi extension; auto-discovered, no settings to edit) |
 | **Hermes (nousresearch)**  | —          | ✓ + skill | `~/.hermes/` (full TUI, no script hook)  |
 
-Pi and Hermes don't expose a script-driven statusline:
-- **Pi** customizes its footer through npm extensions (`pi install npm:pi-powerline-footer`, `pi-bar`, `pi-side-agents`). Our installer drops AGENTS.md and points you at those.
-- **Hermes** ships a fixed built-in TUI with skin-level theming only. We install AGENTS.md + the `statusline-edit` skill so the repo's instructions travel with you.
+- **Pi** is wired via a native extension (`extensions/pi/statusline.mjs`) that Pi auto-discovers from `~/.pi/agent/extensions/`. The extension bridges Pi's session context (`ctx.cwd`, `ctx.model`, `ctx.getContextUsage()`) into the same `statusline.sh` we use everywhere else and renders the output as a widget below the editor. Pi's own native footer stays as-is, so you get both lines.
+- **Hermes** ships a fixed built-in TUI with skin-level theming only and no extension point. We install AGENTS.md + the `statusline-edit` skill so the repo's instructions travel with you.
 
 **OpenCode** doesn't ship the hook yet — the installer writes the two proposed key shapes speculatively so it'll work as soon as anomalyco/opencode#8619 ships.
 
