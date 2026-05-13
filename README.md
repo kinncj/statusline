@@ -1,14 +1,8 @@
 # kinncj statusline
 
-```
- ██╗  ██╗██╗███╗   ██╗███╗   ██╗ ██████╗     ██╗
- ██║ ██╔╝██║████╗  ██║████╗  ██║██╔════╝     ██║
- █████╔╝ ██║██╔██╗ ██║██╔██╗ ██║██║          ██║
- ██╔═██╗ ██║██║╚██╗██║██║╚██╗██║██║     ██   ██║
- ██║  ██╗██║██║ ╚████║██║ ╚████║╚██████╗╚█████╔╝
- ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝ ╚═════╝ ╚════╝
-        s · t · a · t · u · s · l · i · n · e
-```
+<p align="center">
+  <img src="assets/logo.svg" alt="kinncj statusline" width="540">
+</p>
 
 [![CI](https://github.com/kinncj/statusline/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kinncj/statusline/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -110,6 +104,6 @@ See [`AGENTS.md`](AGENTS.md#testing-changes) for the full recipe (mock fixtures,
 
 ## License
 
-[GPL-3.0-or-later](LICENSE) © Kinn Coelho Juliao &lt;kinncj@protonmail.com&gt;
+Copyright © 2026 **Kinn Coelho Juliao** &lt;kinncj@protonmail.com&gt;
 
-The statusline is yours to use, modify, and redistribute — provided derivative works stay under a compatible license. See [`LICENSE`](LICENSE) for the full text.
+Released under the [**GNU General Public License v3.0 or later**](LICENSE) (`SPDX-License-Identifier: GPL-3.0-or-later`). You may use, modify, and redistribute this code — provided any derivative works stay under a GPL-compatible license. The full license text lives in [`LICENSE`](LICENSE); each source file carries an SPDX header for unambiguous attribution.

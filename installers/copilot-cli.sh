@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # GitHub Copilot CLI: ~/.copilot/settings.json -> statusLine.command
 #
 # Schema is shipped (confirmed against github/copilot-cli changelog):

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Claude Code: ~/.claude/settings.json -> statusLine.command
 set -euo pipefail
 source "$(dirname "$0")/_lib.sh"

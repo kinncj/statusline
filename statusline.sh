@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Some intermediate `*_block` variables are built but not joined directly on
 # the final line — they're kept as named breakpoints for readability and for

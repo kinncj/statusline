@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Shared TUI helpers: colors, box-drawing, animated logo, section banners.
 # Sourced (not executed) by install.sh.
 #

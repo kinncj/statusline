@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 # Remote installer for the kinncj statusline.
 #
 # Designed to be run as:

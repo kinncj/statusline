@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Hermes (nousresearch/hermes-agent): full TUI, no scriptable statusline.
 # Install AGENTS.md to ~/.hermes/ so Hermes picks up repo instructions globally.
 # Reference: https://github.com/nousresearch/hermes-agent

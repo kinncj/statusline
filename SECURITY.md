@@ -1,40 +1,67 @@
 # Security Policy
 
+This is a small, open-source shell project. The realistic threat surface is
+narrow and there are no servers, secrets, or user data sitting behind any of
+this code. Default to open reporting; reserve the private channel for the
+rare cases where it actually matters.
+
 ## Supported versions
 
-This project tracks the `main` branch. Only the latest tagged release
-receives fixes. If you need security backports to an older version, open
-an issue and we can discuss.
+Only the latest tagged release on `main` receives fixes. Older versions can
+be patched on request — open an issue.
 
-## Reporting a vulnerability
+## Reporting
 
-Please **do not open a public GitHub issue** for security reports.
+### Default: open a public issue
 
-Email **kinncj@protonmail.com** with:
+For almost everything, **just file a regular GitHub issue**:
+<https://github.com/kinncj/statusline/issues/new>
 
-- A description of the issue and its impact.
-- Steps to reproduce (a minimal failing fixture is ideal — see
-  `tests/fixture-*.json`).
-- Any suggested fix or mitigation, if you have one.
+This is true open source — community review beats secrecy for problems
+like:
 
-You can expect an initial response within seven days. If the issue is
-confirmed, we'll work on a fix on a private branch, coordinate a disclosure
-window with you, and credit you in the changelog unless you'd rather stay
-anonymous.
+- shell quoting or injection bugs in `statusline.sh` / installers,
+- path-traversal or surprise overwrites in `install.sh` / `bootstrap.sh`,
+- the curl-bash flow doing something unexpected on a given platform,
+- shellcheck findings the CI didn't catch.
+
+A reproducible fixture or minimal command line is worth more than a
+threat-model paragraph.
+
+### Private path: when public disclosure is actually risky
+
+For the genuinely sensitive cases — credible active-exploitation reports,
+or a finding where publishing the repro before a fix would put real users
+at risk — use one of:
+
+1. **GitHub Private Vulnerability Reporting**:
+   <https://github.com/kinncj/statusline/security/advisories/new>
+   (Repo → Security tab → *Report a vulnerability*.) This is the modern,
+   tracked path and gives us a private space to coordinate.
+2. **Email**: **kinncj@protonmail.com** with `[statusline-sec]` in the
+   subject. Expect an initial response within seven days.
+
+If you're not sure which lane to use, lean public. The bar for going
+private is "shipping a fix before disclosure would meaningfully reduce
+harm" — most shell-script bugs don't meet it.
+
+## Credit
+
+Reporters are credited in `CHANGELOG.md` for the fixing release unless
+they ask to stay anonymous.
 
 ## Scope
 
-This is a small shell project; the realistic threat surface is:
+In-scope:
 
-- **Shell injection** through values rendered into the statusline
-  (`statusline.sh` already uses `printf '%b'` and quotes inputs to avoid
-  format-string crashes — anything that bypasses this is in-scope).
-- **Path traversal or arbitrary writes** through the installers
-  (`install.sh`, `bootstrap.sh`, `installers/*.sh`).
-- **Privilege escalation** via the bootstrap's `curl | bash` flow — the
-  remote source is GitHub over HTTPS and the bootstrap doesn't run with
-  sudo, but suggestions to harden it (checksum pinning, signed releases)
-  are welcome.
+- shell injection through values rendered into the statusline,
+- path traversal / arbitrary writes via the installers,
+- the `bootstrap.sh` supply-chain surface (hardening suggestions —
+  checksum pinning, signed releases — welcome).
 
-Out of scope: vulnerabilities in third-party tools we shell out to (jq,
-git, ccusage, etc.) — please report those upstream.
+Out of scope:
+
+- vulnerabilities in third-party tools we shell out to (jq, git,
+  ccusage, etc.) — please report those to their upstreams,
+- bugs that require attacker-controlled write access to the user's
+  `~/.claude/` (etc.) before the exploit chain starts.

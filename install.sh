@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 # Portable installer for the kinncj statusline.
 #
 # Targets (auto-detected on $PATH unless --target is passed):

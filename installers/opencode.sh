@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2026 Kinn Coelho Juliao <kinncj@protonmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
 # OpenCode: ~/.config/opencode/opencode.json -> statusline.command
 # Reference: https://opencode.ai/docs/config/
 set -euo pipefail
