@@ -71,9 +71,12 @@ remote_tip_sha() {
 }
 
 CURRENT_DESC=""
-[ -d "$STATUSLINE_DIR/.git" ] && CURRENT_DESC=$(git_describe_head "$STATUSLINE_DIR")
-LATEST_TAG=$(remote_latest_tag)
-LATEST_TIP=$(remote_tip_sha)
+[ -d "$STATUSLINE_DIR/.git" ] && CURRENT_DESC=$(git_describe_head "$STATUSLINE_DIR" || true)
+# These are best-effort: an empty repo (e.g. test fixtures) has no tags and
+# `grep`/`tail` on an empty pipeline returns non-zero, which `pipefail`
+# propagates and `set -e` would otherwise turn into a fatal exit.
+LATEST_TAG=$(remote_latest_tag || true)
+LATEST_TIP=$(remote_tip_sha || true)
 
 echo "kinncj statusline bootstrap"
 echo "  repo:           $REPO_URL"
@@ -100,7 +103,7 @@ else
     git -C "$STATUSLINE_DIR" fetch --depth 1 --tags origin >/dev/null 2>&1 || true
 fi
 
-NEW_DESC=$(git_describe_head "$STATUSLINE_DIR")
+NEW_DESC=$(git_describe_head "$STATUSLINE_DIR" || true)
 if [ -z "$CURRENT_DESC" ]; then
     echo "✓ installed at $NEW_DESC"
 elif [ "$CURRENT_DESC" = "$NEW_DESC" ]; then
