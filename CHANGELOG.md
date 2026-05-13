@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-12
+
+### Fixed
+- Pi extension's handlers were registered with the wrong signature: Pi's
+  `ExtensionHandler<E>` is `(event: E, ctx: ExtensionContext) => …` — ctx
+  is the **second** argument. v0.2.0/0.2.1 wired handlers as
+  `pi.on("session_start", refresh)` where `refresh(ctx)` actually received
+  the event object as its first arg, leaving the real ctx unused. `ctx.ui`
+  was therefore undefined and `setWidget` threw silently inside the
+  try/catch — the extension loaded, handlers fired, no widget rendered.
+  Fixed by wrapping handlers as `(event, ctx) => refresh(ctx)`.
+
+### Added
+- Opt-in debug log for the Pi extension. Set `PI_STATUSLINE_DEBUG=1`
+  before launching `pi` and per-event records (module load, event firings,
+  ctx shape, statusline.sh exit code, setWidget errors) are appended to
+  `/tmp/pi-statusline-debug.log`. No-op when unset.
+
 ## [0.2.1] - 2026-05-12
 
 ### Fixed
@@ -96,7 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   launch. Cleans up the dead `statusLine`/`footer` keys older installer
   versions left in `settings.json`. Verified against Copilot CLI 1.0.46.
 
-[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/kinncj/statusline/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/kinncj/statusline/releases/tag/v0.2.2
 [0.2.1]: https://github.com/kinncj/statusline/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kinncj/statusline/releases/tag/v0.2.0
 [0.1.0]: https://github.com/kinncj/statusline/releases/tag/v0.1.0
