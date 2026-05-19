@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-05-18
+
+### Fixed
+- `installers/opencode.sh` no longer writes the `statusline` and
+  `experimental.statusline` keys. opencode 1.14.x validates its config
+  strictly and refuses to start when those keys are present — it prints
+  `Unrecognized key: statusline` and 4 of 5 startup requests fail
+  (`config.providers`, `provider.list`, `app.agents`, `config.get`).
+  We still copy `statusline.sh` into `~/.config/opencode/` so it's ready
+  if upstream ever ships anomalyco/opencode#8619, but the JSON write is
+  gone. If a previous install left those keys behind, install now strips
+  them, so users recover without editing the file by hand.
+
 ## [0.2.3] - 2026-05-13
 
 ### Changed

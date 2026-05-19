@@ -20,23 +20,19 @@ fi
 copy_statusline "$DEST"
 
 # OpenCode does NOT yet ship a script-driven statusline — tracked as an open
-# feature request at anomalyco/opencode#8619. We write the two key shapes
-# that have been proposed (top-level "statusline" and "experimental.statusline")
-# so that whichever the runtime eventually adopts will pick it up without a
-# re-install. Until shipped, this is dead JSON; the AGENTS.md drop is what
-# actually carries weight.
-# shellcheck disable=SC2016  # $schema and $cmd are jq variables bound by --arg
-json_set "$SETTINGS" \
-    --arg schema "https://opencode.ai/config.json" \
-    --arg cmd "$DEST" \
-    '. + {
-        "$schema": $schema,
-        "statusline": {"command": $cmd},
-        "experimental": (.experimental // {} | . + {"statusline": {"command": $cmd}})
-    }'
+# feature request at anomalyco/opencode#8619. Earlier versions of this
+# installer speculatively wrote `statusline` and `experimental.statusline`
+# config keys; opencode's schema is strict and now refuses to start when
+# unknown keys are present, so we no longer write them. If a prior install
+# left those keys behind, strip them so opencode boots again. The AGENTS.md
+# drop is what actually carries weight today.
+if [ -f "$SETTINGS" ] && jq -e '.statusline? // .experimental.statusline?' "$SETTINGS" >/dev/null 2>&1; then
+    info "removing legacy speculative statusline keys from $SETTINGS"
+    json_set "$SETTINGS" 'del(.statusline) | del(.experimental.statusline) | if .experimental == {} then del(.experimental) else . end'
+fi
 
 warn "opencode upstream has NOT shipped a statusline hook yet"
 info "tracking issue: https://github.com/anomalyco/opencode/issues/8619"
-info "we wrote the proposed config keys speculatively so a future ship auto-activates"
-info "today, opencode renders its built-in footer and ignores these keys"
-ok "opencode config written (statusline pending upstream)"
+info "statusline.sh is installed at $DEST and ready for when upstream ships the hook"
+info "today, opencode renders its built-in footer; AGENTS.md is the active surface"
+ok "opencode statusline staged (pending upstream)"
